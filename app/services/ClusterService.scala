@@ -16,6 +16,7 @@ import dao.GeologDAO
 import javax.inject.Singleton
 import models.ClusterQueueResponse
 import models.Geolog
+import play.api.Logger
 import play.api.libs.json.JsError
 import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json
@@ -61,6 +62,7 @@ class ClusterService @Inject() (
               case Success(result) => {
                 clusterDao.find(result). onComplete { 
                   case Success(clusterSeq) => clusterSeq.map { geologDao.findAndAddToCluster }
+                  case Failure(t) => Logger.error(t.toString())
                 }
               }
             }

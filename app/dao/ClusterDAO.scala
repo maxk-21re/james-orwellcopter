@@ -1,5 +1,6 @@
 package dao
 
+import com.vividsolutions.jts.geom.Point
 import play.api.Logger
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -35,6 +36,16 @@ class ClusterDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvid
     }
 
   def find(ids: Seq[Long]):Future[Seq[Cluster]] = db.run(Clusters.filter(c => c.id inSet ids).result).map { toCluster }
+
+  def clusterForPoint(point: Point): Future[Option[Cluster]] = {
+    val action = Clusters.filter(_.mbr contains point ).result.headOption
+    db.run(action).map { option =>
+      option match {
+        case Some(rawCluster) => Some(toCluster(rawCluster))
+        case None => None
+      }
+    }
+  }
 
   def insert(cluster: Cluster): Future[Long] = db.run((Clusters returning Clusters.map(_.id)) += toRawCluster(cluster))
   def insert(clusters: Seq[Cluster]): Future[Seq[Long]] = db.run((Clusters returning Clusters.map(_.id)) ++= toRawCluster(clusters))

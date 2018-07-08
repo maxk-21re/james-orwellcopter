@@ -1,5 +1,6 @@
 package services
 
+import dao.ClusterDAO
 import org.eclipse.paho.client.mqttv3.MqttMessage
 
 import dao.UserDAO
@@ -27,7 +28,7 @@ import java.time.Instant
 import play.api.Logger
 
 @Singleton()
-class OwntracksParser @Inject()(userDao: UserDAO, geologDao: GeologDAO)(implicit ec: ExecutionContext){
+class OwntracksParser @Inject()(userDao: UserDAO, geologDao: GeologDAO, clusterDao: ClusterDAO)(implicit ec: ExecutionContext){
   def parse(topic: String, payload: MqttMessage) {
 
     val e = for {
@@ -39,11 +40,16 @@ class OwntracksParser @Inject()(userDao: UserDAO, geologDao: GeologDAO)(implicit
       case Some((om,userinfo)) => {
         for {
         	user <- userDao.getOrCreateUser(userinfo.username)
+          cluster <- clusterDao.clusterForPoint(new GeometryFactory(new PrecisionModel(),0).createPoint(new Coordinate(om.lat, om.lon)))
           geolog = geologDao.insert(Geolog(
               new GeometryFactory(new PrecisionModel(),0).createPoint(new Coordinate(om.lat, om.lon)),
               om.acc,
               LocalDateTime.ofInstant(Instant.ofEpochMilli(om.tst * 1000),ZoneId.of("Europe/Berlin")),
-              user.id
+            user.id,
+            cluster match {
+              case Some(c) => Some(c.id)
+              case None => None
+            }
           )).onComplete {
         	  case Failure(t) => println(t.getMessage)
         	  case _ => Logger.info("Added new Geolog")

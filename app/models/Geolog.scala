@@ -9,8 +9,6 @@ import com.vividsolutions.jts.geom.Point
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import play.api.libs.json.JsPath
-import play.api.libs.json.Json
 import java.time.format.DateTimeFormatter
 
 
@@ -20,6 +18,7 @@ case class Geolog(
     accuracy: Int, 
     timestamp: LocalDateTime, 
     userId: Long,
+    clusterId: Option[Long] = None,
     id: Long = 0L)
 
 object Geolog {
@@ -48,21 +47,25 @@ object Geolog {
   )((latitude, longitude) => new GeometryFactory().createPoint(new Coordinate(latitude, longitude)))
   
   
-  implicit val geologWrites: Writes[Geolog] = (
-    (JsPath \ "location").write[Point] and
-    (JsPath \ "accuracy").write[Int] and
-    (JsPath \ "timestamp").write[LocalDateTime] and 
-    (JsPath \ "userId").write[Long] and 
-    (JsPath \ "id").write[Long]
-  )(unlift(Geolog.unapply))
+  // implicit val geologWrites: Writes[Geolog] = (
+  //   (JsPath \ "location").write[Point] and
+  //   (JsPath \ "accuracy").write[Int] and
+  //   (JsPath \ "timestamp").write[LocalDateTime] and 
+  //   (JsPath \ "userId").write[Long] and 
+  //   (JsPath \ "custerId").write[Option[Long]] and 
+  //   (JsPath \ "id").write[Long]
+  // )(unlift(Geolog.unapply))
   
   
-  implicit val geologReads: Reads[Geolog] = (
-    (JsPath \ "location").read[Point] and
-    (JsPath \ "accuracy").read[Int] and
-    (JsPath \ "timestamp").read[LocalDateTime]  and
-    (JsPath \ "userId").read[Long] and 
-    (JsPath \ "id").read[Long]
-  )(Geolog.apply _)
+  // implicit val geologReads: Reads[Geolog] = (
+  //   (JsPath \ "location").read[Point] and
+  //   (JsPath \ "accuracy").read[Int] and
+  //   (JsPath \ "timestamp").read[LocalDateTime]  and
+  //   (JsPath \ "userId").read[Long] and 
+  //   (JsPath \ "clusterId").read[Option[Long]] and 
+  //   (JsPath \ "id").read[Long]
+  // )(Geolog.apply _)
+
+  implicit val geologFormat = Json.format[Geolog]
   
 }

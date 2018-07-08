@@ -34,8 +34,8 @@ class GeologDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvide
   }
 
 
-  def findAndAddToCluster(cluster: Cluster): Future[Seq[Geolog]] = {
-    val action = Geologs.filter( g => g.location <@ new GeometryFactory().toGeometry(cluster.mbr) ).result
+  def findAndAddToCluster(cluster: Cluster) = {
+    val action = Geologs.filter( g => g.location <@ new GeometryFactory().toGeometry(cluster.mbr) ).map(_.clusterId).update(Some(cluster.id))
     db.run(action)
   }
 
@@ -44,8 +44,9 @@ class GeologDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvide
     def accuracy = column[Int]("accuracy")
     def timestamp = column[LocalDateTime]("timestamp")
     def userId = column[Long]("userid")
+    def clusterId = column[Option[Long]]("clusterid")
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     
-    def * = (location, accuracy, timestamp, userId, id) <> ((Geolog.apply _).tupled, Geolog.unapply)
+    def * = (location, accuracy, timestamp, userId, clusterId, id) <> ((Geolog.apply _).tupled, Geolog.unapply)
   }
 }
