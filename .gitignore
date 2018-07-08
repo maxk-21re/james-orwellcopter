@@ -1,0 +1,12 @@
+target/
+project/target/
+project/project/
+node_modules/
+.ensime
+.ensime_cache/
+project/project/
+logs/
+bin
+.classpath
+.cache-*
+.env
