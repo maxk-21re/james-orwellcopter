@@ -31,3 +31,12 @@ libraryDependencies ++= Seq(
 )
 
 resolvers += "MQTT Repository" at "https://repo.eclipse.org/content/repositories/paho-releases/"
+
+enablePlugins(ScalafmtPlugin)
+scalafmtVersion := "1.0.0"
+(compile in Compile) := {
+  (compile in Compile) dependsOn (scalafmt in Compile).toTask
+}.value
+(compile in Test) := {
+  (compile in Test) dependsOn (scalafmt in Test).toTask
+}.value
