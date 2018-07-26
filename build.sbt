@@ -1,4 +1,4 @@
-name := """james-scala"""
+name := """james-orwellcopter"""
 
 version := "1.0-SNAPSHOT"
 
@@ -6,11 +6,11 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 resolvers += Resolver.sonatypeRepo("snapshots")
 resolvers += "New Motion Repository" at "http://nexus.thenewmotion.com/content/groups/public/"
-
+resolvers += "MQTT Repository" at "https://repo.eclipse.org/content/repositories/paho-releases/"
 
 scalaVersion := "2.12.4"
 
-crossScalaVersions := Seq("2.11.12", "2.12.4")
+crossScalaVersions := Seq("2.12.4")
 
 libraryDependencies += guice
 libraryDependencies += evolutions
@@ -30,9 +30,12 @@ libraryDependencies ++= Seq(
   "com.enragedginger" %% "akka-quartz-scheduler" % "1.6.1-akka-2.5.x"
 )
 
-resolvers += "MQTT Repository" at "https://repo.eclipse.org/content/repositories/paho-releases/"
 
 enablePlugins(ScalafmtPlugin)
+enablePlugins(AshScriptPlugin)
+
+dockerBaseImage       := "openjdk:jre-alpine"
+
 scalafmtVersion := "1.0.0"
 (compile in Compile) := {
   (compile in Compile) dependsOn (scalafmt in Compile).toTask
