@@ -39,10 +39,10 @@ libraryDependencies ++= Seq(
 enablePlugins(ScalafmtPlugin)
 enablePlugins(AshScriptPlugin)
 
-val gitBranch = sys.env.get("TRAVIS_CURRENT_BRANCH")
+val gitBranch = sys.env.get("TRAVIS_CURRENT_BRANCH").get
 
 dockerUpdateLatest := {
-  if(gitBranch == Some("master")){ true } else { false }
+  if(gitBranch == "master"){ true } else { false }
 }
 
 dockerUsername := Some("mietzekotze")
