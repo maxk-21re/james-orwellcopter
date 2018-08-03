@@ -6,7 +6,7 @@ script:
   - sbt ++$TRAVIS_SCALA_VERSION compile test:compile
 
 after_success:
-  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASS
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   - sbt docker:publish
 
 notifications:
