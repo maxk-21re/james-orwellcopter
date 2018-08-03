@@ -34,6 +34,12 @@ libraryDependencies ++= Seq(
 enablePlugins(ScalafmtPlugin)
 enablePlugins(AshScriptPlugin)
 
+dockerUsername := Some("mietzekotze")
+version in Docker     := {
+  import java.time.{Clock, LocalDateTime}
+  import java.time.format.DateTimeFormatter
+  LocalDateTime.now(Clock.systemUTC()).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+}
 dockerBaseImage       := "openjdk:jre-alpine"
 
 scalafmtVersion := "1.0.0"

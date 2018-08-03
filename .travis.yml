@@ -4,7 +4,11 @@ scala:
    
 script: 
   - sbt ++$TRAVIS_SCALA_VERSION compile test:compile
-  
+
+after_success:
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASS
+  - sbt docker:publish
+
 notifications:
   email:
     - max.kiehnscherf@gmail.com 
