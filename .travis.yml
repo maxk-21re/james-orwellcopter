@@ -3,11 +3,11 @@ scala:
    - 2.12.2
    
 script: 
+  - echo $TRAVIS_CURRENT_BRANCH 
   - sbt ++$TRAVIS_SCALA_VERSION compile test:compile
 
 after_success:
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-  - echo $TRAVIS_CURRENT_BRANCH 
   - sbt docker:publish
 
 notifications:
