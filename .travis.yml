@@ -3,7 +3,7 @@ scala:
    - 2.12.2
    
 script: 
-  - echo $TRAVIS_CURRENT_BRANCH 
+  - echo $TRAVIS_BRANCH 
   - sbt ++$TRAVIS_SCALA_VERSION compile test:compile
 
 after_success:
