@@ -1,3 +1,8 @@
+import sbt._
+import complete.DefaultParsers._
+import Keys._
+import sys.process.Process
+
 name := """james-orwellcopter"""
 
 version := "1.0-SNAPSHOT"
@@ -33,6 +38,12 @@ libraryDependencies ++= Seq(
 
 enablePlugins(ScalafmtPlugin)
 enablePlugins(AshScriptPlugin)
+
+val gitBranch = Process("git rev-parse --abbrev-ref HEAD").lineStream.head
+
+dockerUpdateLatest := {
+  if(gitBranch == "master"){ true } else { false }
+}
 
 dockerUsername := Some("mietzekotze")
 version in Docker     := {
