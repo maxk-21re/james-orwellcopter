@@ -39,7 +39,7 @@ libraryDependencies ++= Seq(
 enablePlugins(ScalafmtPlugin)
 enablePlugins(AshScriptPlugin)
 
-val gitBranch = sys.env.get("TRAVIS_BRANCH").get
+val gitBranch = sys.env.get("TRAVIS_BRANCH").getOrElse("")
 
 dockerUpdateLatest := {
   if(gitBranch == "master"){ true } else { false }

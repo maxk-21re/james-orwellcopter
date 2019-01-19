@@ -1,7 +1,5 @@
 package services
 
-
-
 import scala.concurrent.Future
 
 import org.eclipse.paho.client.mqttv3._
@@ -22,7 +20,7 @@ class MqttConnector @Inject() (
     appLifecycle: ApplicationLifecycle,
     mqttMessageHandler: MqttMessageHandler,
   ){
-    mqttMessageHandler.start()    
+    mqttMessageHandler.start()
     appLifecycle.addStopHook( () => {
       mqttMessageHandler.stop()
       Future.successful(());
@@ -32,10 +30,9 @@ class MqttConnector @Inject() (
 @Singleton()
 class MqttMessageHandler @Inject()(
     owntracksParser: OwntracksParser,
-config: Configuration
+    config: Configuration
   ){
-  
-  
+
   val brokerUrl = config.get[String]("orwellcopter.mqtt.server")
   val persistence = new MemoryPersistence
   val client = new MqttClient(this.brokerUrl, MqttClient.generateClientId, this.persistence)
@@ -46,9 +43,9 @@ config: Configuration
     val connectionOptions = new MqttConnectOptions()
     connectionOptions.setUserName(config.get[String]("orwellcopter.mqtt.user"))
     connectionOptions.setPassword(config.get[String]("orwellcopter.mqtt.pass").toArray)
-    
 
-    //Connect to MqttBroker    
+
+    //Connect to MqttBroker
     this.client.connect(connectionOptions)
     //Subscribe to Mqtt topic
     this.client.subscribe(topic)
@@ -72,7 +69,7 @@ config: Configuration
     client.setCallback(callback)
 
   }
-  
+
   def stop() {
     Logger.info(s"Stopping MQTT-Client")
     this.client.disconnect()
