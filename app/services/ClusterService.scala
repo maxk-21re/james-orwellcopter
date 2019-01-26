@@ -24,18 +24,20 @@ import dao.ClusterDAO
 import javax.inject.Inject
 import scala.util.{Failure, Success}
 import scala.concurrent.ExecutionContext
+import play.api.Configuration
 
 @Singleton
 class ClusterService @Inject()(
     clusterDao: ClusterDAO,
-    geologDao: GeologDAO
+    geologDao: GeologDAO,
+    config: Configuration
 )(implicit ec: ExecutionContext) {
 
   implicit val system = ActorSystem()
   val factory         = new ConnectionFactory()
-  factory.setHost("127.0.0.1")
-  factory.setUsername("rabbitmq")
-  factory.setPassword("rabbitmq")
+  factory.setHost(config.get[String]("orwellcopter.amqp.server"))
+  factory.setUsername(config.get[String]("orwellcopter.amqp.user"))
+  factory.setPassword(config.get[String]("orwellcopter.amqp.pass"))
 
   val connection   = system.actorOf(ConnectionActor.props(factory), "rabbitmq")
   val exchangeName = "CLUSTER"
