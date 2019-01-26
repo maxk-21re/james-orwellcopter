@@ -18,7 +18,6 @@ scalaVersion := "2.12.4"
 crossScalaVersions := Seq("2.12.4")
 
 libraryDependencies += guice
-libraryDependencies += evolutions
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
 libraryDependencies += "org.eclipse.paho" % "org.eclipse.paho.client.mqttv3" % "1.2.0"
 libraryDependencies ++= Seq(
