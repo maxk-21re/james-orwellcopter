@@ -16,7 +16,7 @@ services:
     networks:
       - orwellcopter
   orwellcopter:
-      image: mietzekotze/james-orwellcopter:20190122195037
+      image: mietzekotze/james-orwellcopter
       deploy:
         labels:
           - "traefik.docker.network=proxy"
