@@ -9,6 +9,8 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
+PlayKeys.playRunHooks += Yarn(baseDirectory.value)
+
 resolvers += Resolver.sonatypeRepo("snapshots")
 resolvers += "New Motion Repository" at "http://nexus.thenewmotion.com/content/groups/public/"
 resolvers += "MQTT Repository" at "https://repo.eclipse.org/content/repositories/paho-releases/"
