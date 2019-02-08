@@ -25,12 +25,21 @@ class GeologDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
 
   def all(): Future[Seq[Geolog]] = db.run(Geologs.result)
 
+  def find(id: Long): Future[Option[Geolog]] =
+    db.run(Geologs.filter(_.id === id).result.headOption)
+
   def insert(geolog: Geolog): Future[Unit] = db.run(Geologs += geolog).map(_ => ())
 
   def ofDay(date: LocalDate): Future[Seq[Geolog]] =
     db.run(
       Geologs
         .filter(g => g.timestamp.between(date.atStartOfDay(), date.atTime(LocalTime.MAX)))
+        .result)
+
+  def between(startDate: LocalDate, endDate: LocalDate): Future[Seq[Geolog]] =
+    db.run(
+      Geologs
+        .filter(g => g.timestamp.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)))
         .result)
 
   def forYesterday(): Future[Seq[Geolog]] = {
