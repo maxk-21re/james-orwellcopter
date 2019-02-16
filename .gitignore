@@ -11,3 +11,4 @@ bin
 .cache-*
 .env
 dist/
+public/

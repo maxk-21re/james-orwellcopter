@@ -15,9 +15,7 @@ import scala.concurrent.Future
   * application's home page.
   */
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents,
-                               geologDao: GeologDAO,
-                               clusterService: ClusterService)(implicit assetsFinder: AssetsFinder)
+class HomeController @Inject()(cc: ControllerComponents)(implicit assetsFinder: AssetsFinder)
     extends AbstractController(cc) {
 
   /**
@@ -26,20 +24,7 @@ class HomeController @Inject()(cc: ControllerComponents,
     * will be called when the application receives a `GET` request with
     * a path of `/`.
     */
-  def index = Action.async {
-    geologDao.forYesterday().map { log =>
-      Ok(Json.toJson(log))
-    }
+  def index = Action { implicit request =>
+    Ok(views.html.index())
   }
-
-  def listPlaces = Action {
-    Ok("lol")
-  }
-
-  def cluster = Action.async { request =>
-    geologDao.forYesterday().map { log =>
-      Ok(Json.toJson(log))
-    }
-  }
-
 }
