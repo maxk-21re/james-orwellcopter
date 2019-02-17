@@ -40,6 +40,7 @@ class GeologDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider
     db.run(
       Geologs
         .filter(g => g.timestamp.between(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)))
+        .sortBy(_.timestamp.desc)
         .result)
 
   def forYesterday(): Future[Seq[Geolog]] = {
