@@ -43,6 +43,7 @@ class MqttMessageHandler @Inject()(
     val connectionOptions = new MqttConnectOptions()
     connectionOptions.setUserName(config.get[String]("orwellcopter.mqtt.user"))
     connectionOptions.setPassword(config.get[String]("orwellcopter.mqtt.pass").toArray)
+    connectionOptions.setAutomaticReconnect(true);
 
 
     //Connect to MqttBroker
@@ -57,7 +58,7 @@ class MqttMessageHandler @Inject()(
       }
 
       override def connectionLost(cause: Throwable): Unit = {
-         println(cause)
+         println("Lost connection to MQTT-Broker: " + cause)
        }
 
       override def deliveryComplete(token: IMqttDeliveryToken): Unit = {

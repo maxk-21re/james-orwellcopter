@@ -1,8 +1,10 @@
 language: scala
 scala:
    - 2.12.2
-   
+before_script:
+  - nvm install latest
 script: 
+  - yarn && yarn build
   - sbt ++$TRAVIS_SCALA_VERSION compile test:compile
 
 after_success:
