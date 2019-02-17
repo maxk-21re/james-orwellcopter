@@ -10,7 +10,7 @@ import { from, of, pipe} from "rxjs";
 import { ajax } from "rxjs/ajax";
 import { Geolog } from "../models/geologs";
 
-const geologsFetchEpic: Epic<GeologAction, GeologAction, GeologState, typeof getGeologs> = (action$, state, getGeologs) =>
+const geologsFetchEpic: Epic<GeologAction, GeologAction, GeologState> = (action$, _) =>
   action$
     .pipe(
       ofType(getType(fetchGeologs.request)),

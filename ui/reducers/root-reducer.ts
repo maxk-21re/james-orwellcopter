@@ -20,7 +20,6 @@ const reducer = combineReducers<GeologState, GeologAction>({
   data: (state = GeologDefaultState.data, action: GeologAction) => {
     switch(action.type) {
       case getType(geologs.fetchGeologs.success):
-        console.log("lol")
         return action.payload;
       case getType(geologs.addGeologs):
         return [...state, ...action.payload]
@@ -33,7 +32,6 @@ const reducer = combineReducers<GeologState, GeologAction>({
       case getType(geologs.fetchGeologs.failure):
         return action.payload;
       case getType(geologs.fetchGeologs.request):
-        console.log("lol")
         return null;
       case getType(geologs.fetchGeologs.success):
         return null;

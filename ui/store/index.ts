@@ -8,8 +8,9 @@ import { compose } from 'redux';
 export const epicMiddleware = createEpicMiddleware<GeologAction, GeologAction, GeologState, typeof services.getGeologs>({dependencies: services.getGeologs})
 
 const middlewares = [epicMiddleware];
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const store = createStore(GeologReducer, GeologDefaultState, compose(applyMiddleware(...middlewares)));
+const store = createStore(GeologReducer, GeologDefaultState, composeEnhancers(applyMiddleware(...middlewares)));
 
 epicMiddleware.run(RootEpic);
 
