@@ -65,6 +65,10 @@ class MqttMessageHandler @Inject()(
          Logger.error("Lost connection to MQTT-Broker. Attempt to reconnect.", cause)
          mqttConnect()
       }
+
+      override def deliveryComplete(token: IMqttDeliveryToken): Unit = {
+      }
+
     }
 
     //Set up callback for MqttClient
