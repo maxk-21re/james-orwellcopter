@@ -34,35 +34,36 @@ class MqttMessageHandler @Inject()(
   ){
 
   val brokerUrl = config.get[String]("orwellcopter.mqtt.server")
-  val persistence = new MemoryPersistence
-  val client = new MqttClient(this.brokerUrl, MqttClient.generateClientId, this.persistence)
+  val client = new MqttClient(brokerUrl, MqttClient.generateClientId, new MemoryPersistence)
+
+  val connectionOptions = new MqttConnectOptions()
+  connectionOptions.setUserName(config.get[String]("orwellcopter.mqtt.user"))
+  connectionOptions.setPassword(config.get[String]("orwellcopter.mqtt.pass").toArray)
+  connectionOptions.setAutomaticReconnect(true);
 
   def start() {
     Logger.info(s"Starting MQTT-Client")
     val topic = "owntracks/+/+"
-    val connectionOptions = new MqttConnectOptions()
-    connectionOptions.setUserName(config.get[String]("orwellcopter.mqtt.user"))
-    connectionOptions.setPassword(config.get[String]("orwellcopter.mqtt.pass").toArray)
-    connectionOptions.setAutomaticReconnect(true);
 
+    mqttConnect()
 
-    //Connect to MqttBroker
-    this.client.connect(connectionOptions)
     //Subscribe to Mqtt topic
-    this.client.subscribe(topic)
+    client.subscribe(topic)
+
     //Callback automatically triggers as and when new message arrives on specified topic
-    val callback = new MqttCallback {
+    val callback = new MqttCallbackExtended {
+
+      override def connectComplete(reconnect: Boolean, url: String) {
+        Logger.info(s"""${if(reconnect) "Reconnected" else "Connected"} to $url""")
+      }
 
       override def messageArrived(topic: String, message: MqttMessage): Unit = {
         owntracksParser.parse(topic, message);
       }
 
       override def connectionLost(cause: Throwable): Unit = {
-         println("Lost connection to MQTT-Broker: " + cause)
-       }
-
-      override def deliveryComplete(token: IMqttDeliveryToken): Unit = {
-
+         Logger.error("Lost connection to MQTT-Broker. Attempt to reconnect.", cause)
+         mqttConnect()
       }
     }
 
@@ -71,8 +72,17 @@ class MqttMessageHandler @Inject()(
 
   }
 
+  def mqttConnect() {
+    try {
+      client.connect(connectionOptions)
+    } catch {
+      case e: MqttSecurityException => Logger.error("Connecting failed for security reasons.", e)
+      case e: MqttException => Logger.error("Connecting failed.", e)
+    }
+  }
+
   def stop() {
     Logger.info(s"Stopping MQTT-Client")
-    this.client.disconnect()
+    client.disconnect()
   }
 }
