@@ -47,8 +47,6 @@ class MqttMessageHandler @Inject()(
       // Hopefully this whole thing will restart listening for messages again
       // after connecting.
       Logger.info(s"""${if(reconnect) "Reconnected" else "Connected"} to $url""")
-      client.subscribe(topic)
-      client.setCallback(this)
     }
 
     override def messageArrived(topic: String, message: MqttMessage): Unit = {
@@ -69,6 +67,8 @@ class MqttMessageHandler @Inject()(
 
     try {
       client.connect(connectionOptions)
+      client.subscribe(topic)
+      client.setCallback(callback)
     } catch {
       case e: MqttSecurityException => Logger.error("Connecting failed for security reasons.", e)
       case e: MqttException => Logger.error("Connecting failed.", e)
