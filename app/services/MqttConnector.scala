@@ -35,48 +35,38 @@ class MqttMessageHandler @Inject()(
 
   val brokerUrl = config.get[String]("orwellcopter.mqtt.server")
   val client = new MqttClient(brokerUrl, MqttClient.generateClientId, new MemoryPersistence)
+  val topic = "owntracks/+/+"
 
   val connectionOptions = new MqttConnectOptions()
   connectionOptions.setUserName(config.get[String]("orwellcopter.mqtt.user"))
   connectionOptions.setPassword(config.get[String]("orwellcopter.mqtt.pass").toArray)
   connectionOptions.setAutomaticReconnect(true);
+  val callback = new MqttCallbackExtended {
+
+    override def connectComplete(reconnect: Boolean, url: String) {
+      // Hopefully this whole thing will restart listening for messages again
+      // after connecting.
+      Logger.info(s"""${if(reconnect) "Reconnected" else "Connected"} to $url""")
+      client.subscribe(topic)
+      client.setCallback(this)
+    }
+
+    override def messageArrived(topic: String, message: MqttMessage): Unit = {
+      owntracksParser.parse(topic, message);
+    }
+
+    override def connectionLost(cause: Throwable): Unit = {
+        Logger.error("Lost connection to MQTT-Broker. Attempt to reconnect.", cause)
+        start()
+    }
+
+    override def deliveryComplete(token: IMqttDeliveryToken): Unit = {
+    }
+  }
 
   def start() {
     Logger.info(s"Starting MQTT-Client")
-    val topic = "owntracks/+/+"
 
-    mqttConnect()
-
-    //Subscribe to Mqtt topic
-    client.subscribe(topic)
-
-    //Callback automatically triggers as and when new message arrives on specified topic
-    val callback = new MqttCallbackExtended {
-
-      override def connectComplete(reconnect: Boolean, url: String) {
-        Logger.info(s"""${if(reconnect) "Reconnected" else "Connected"} to $url""")
-      }
-
-      override def messageArrived(topic: String, message: MqttMessage): Unit = {
-        owntracksParser.parse(topic, message);
-      }
-
-      override def connectionLost(cause: Throwable): Unit = {
-         Logger.error("Lost connection to MQTT-Broker. Attempt to reconnect.", cause)
-         mqttConnect()
-      }
-
-      override def deliveryComplete(token: IMqttDeliveryToken): Unit = {
-      }
-
-    }
-
-    //Set up callback for MqttClient
-    client.setCallback(callback)
-
-  }
-
-  def mqttConnect() {
     try {
       client.connect(connectionOptions)
     } catch {
