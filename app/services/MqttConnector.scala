@@ -41,12 +41,15 @@ class MqttMessageHandler @Inject()(
   connectionOptions.setUserName(config.get[String]("orwellcopter.mqtt.user"))
   connectionOptions.setPassword(config.get[String]("orwellcopter.mqtt.pass").toArray)
   connectionOptions.setAutomaticReconnect(true);
+  connectionOptions.setCleanSession(true);
+
   val callback = new MqttCallbackExtended {
 
     override def connectComplete(reconnect: Boolean, url: String) {
       // Hopefully this whole thing will restart listening for messages again
       // after connecting.
       Logger.info(s"""${if(reconnect) "Reconnected" else "Connected"} to $url""")
+      client.subscribe(topic)
     }
 
     override def messageArrived(topic: String, message: MqttMessage): Unit = {
@@ -67,11 +70,12 @@ class MqttMessageHandler @Inject()(
 
     try {
       client.connect(connectionOptions)
-      client.subscribe(topic)
       client.setCallback(callback)
+      client.subscribe(topic)
     } catch {
       case e: MqttSecurityException => Logger.error("Connecting failed for security reasons.", e)
       case e: MqttException => Logger.error("Connecting failed.", e)
+      case _: Throwable => Logger.error("Unknown exception while trying to connect to MQTT Service.")
     }
   }
 
