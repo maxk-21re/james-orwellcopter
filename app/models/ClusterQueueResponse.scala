@@ -11,7 +11,7 @@ case class ClusterQueueResponse(mbr: ((Float, Float), (Float, Float)),
 
   def toCluster(): Cluster = {
     new Cluster(new Envelope(mbr._2._2, mbr._1._2, mbr._2._1, mbr._1._1),
-      shell.validate[Polygon].get,
+                shell.validate[Fuckery].get,
                 location,
                 adress)
   }
