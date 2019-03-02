@@ -5,8 +5,11 @@
     "watch": "webpack --mode development --watch --hot --progress --profile --colors --display-error-details --display-cached"
   },
   "dependencies": {
+    "@material/react-material-icon": "^0.10.0",
+    "@types/moment": "^2.13.0",
     "axios": "^0.18.0",
     "decko": "^1.2.0",
+    "moment": "^2.24.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-map-gl": "^4.0.10",

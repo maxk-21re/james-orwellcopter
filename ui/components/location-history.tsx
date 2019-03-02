@@ -2,9 +2,11 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { GeologState } from "../reducers/root-reducer";
 import { fetchGeologs } from "../actions/root-actions";
-import { Grid, GridItem, Panel } from "typed-components";
+import { Grid, GridItem, Panel, Button } from "typed-components";
 import {default as ReactMapGL, Marker} from "react-map-gl";
 import { Geolog } from "../models/geologs";
+import MaterialIcons from "@material/react-material-icon";
+import * as moment from "moment";
 
 const mapStateToProps = (state: GeologState) => ({
   isLoading: state.loading,
@@ -40,6 +42,22 @@ class LocationHistory extends React.Component<Props, State> {
     clearInterval(this.intervalId);
   }
 
+  renderLocationItem(log: Geolog, active: boolean) {
+    return (<>
+      <Grid columns={[[1, "fr"]]}>
+        <GridItem alignItems="center">
+          {moment.parseZone(log.timestamp).format("HH:mm")}
+        </GridItem>
+      </Grid>
+      <div />
+      <Grid columns={[[1, "fr"]]}>
+        <Button color={active ? "primary" : "secondary"} type="blank" onClick={() => this.setState({hovered: log})}>
+          <MaterialIcons icon={ active ? "gps_fixed" : "location_searching"}  />
+        </Button>
+      </Grid>
+    </>)
+  }
+
   render() {
     const [first, ...rest] = this.props.logs;
     const {hovered} = this.state;
@@ -52,14 +70,11 @@ class LocationHistory extends React.Component<Props, State> {
           <Grid colSpec="repeat(12, 1fr)" rowSpec="repeat(12, 1fr)" height={[100, "%"]} width={[100, "%"]}>
             <GridItem columnStart={9} columnEnd={12} rowStart={4} rowEnd={12} >
               <Panel header="Logs">
-                <ul>
+                <Grid rowGap={[20, "px"]} colSpec={"fit-content(100%) 1fr fit-content(100%)"}>
                   {
                     this.props.logs
-                        .map( i => <li
-                                    onMouseEnter={() => this.setState({hovered: i})} key={i.id}
-                                    onMouseLeave={() => this.setState({hovered: undefined})}
-                                  >{i.timestamp}</li>)}
-                </ul>
+                        .map(i => this.renderLocationItem(i, hovered && hovered.id == i.id))}
+                </Grid>
               </Panel>
             </GridItem>
           </Grid>
