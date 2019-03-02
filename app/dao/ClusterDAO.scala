@@ -1,6 +1,6 @@
 package dao
 
-import com.vividsolutions.jts.geom.Point
+import com.vividsolutions.jts.geom.{Point, Polygon}
 import play.api.Logger
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -23,7 +23,11 @@ class ClusterDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     extends HasDatabaseConfigProvider[JdbcProfile] {
   import util.PostgresProfile.api._
 
-  case class RawCluster(mbr: Geometry, location: JsValue, adress: JsValue, id: Long = 0L)
+  case class RawCluster(mbr: Geometry,
+                        shell: Polygon,
+                        location: JsValue,
+                        adress: JsValue,
+                        id: Long = 0L)
 
   private val Clusters = TableQuery[ClusterTable]
 
@@ -56,12 +60,14 @@ class ClusterDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     db.run((Clusters returning Clusters.map(_.id)) ++= toRawCluster(clusters))
 
   def toCluster(raw: RawCluster): Cluster =
-    new Cluster(raw.mbr.getEnvelopeInternal(), raw.location, raw.adress, raw.id)
+    new Cluster(raw.mbr.getEnvelopeInternal(), raw.shell, raw.location, raw.adress, raw.id)
+
   def toCluster(raw: Seq[RawCluster]): Seq[Cluster] =
-    raw.map(e => new Cluster(e.mbr.getEnvelopeInternal, e.adress, e.adress, e.id))
+    raw.map(e => new Cluster(e.mbr.getEnvelopeInternal, e.shell, e.adress, e.adress, e.id))
 
   def toRawCluster(cluster: Cluster): RawCluster =
     new RawCluster(new GeometryFactory().toGeometry(cluster.mbr),
+                   cluster.shell,
                    cluster.location,
                    cluster.adress,
                    cluster.id)
@@ -69,16 +75,19 @@ class ClusterDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     clusters.map(
       cluster =>
         new RawCluster(new GeometryFactory().toGeometry(cluster.mbr),
+                       cluster.shell,
                        cluster.location,
                        cluster.adress,
                        cluster.id))
 
   class ClusterTable(tag: Tag) extends Table[RawCluster](tag, "clusters") {
     def mbr      = column[Geometry]("mbr")
+    def shell    = column[Polygon]("shell")
     def location = column[JsValue]("location")
     def adress   = column[JsValue]("adress")
     def id       = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
-    def * = (mbr, location, adress, id) <> ((RawCluster.apply _).tupled, RawCluster.unapply _)
+    def * =
+      (mbr, shell, location, adress, id) <> ((RawCluster.apply _).tupled, RawCluster.unapply _)
   }
 }
