@@ -53,6 +53,7 @@ class MqttMessageHandler @Inject()(
     }
 
     override def messageArrived(topic: String, message: MqttMessage): Unit = {
+      Logger.info("Received Payload.")
       owntracksParser.parse(topic, message);
     }
 

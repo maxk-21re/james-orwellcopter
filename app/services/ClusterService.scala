@@ -62,6 +62,7 @@ class ClusterService @Inject()(
                                   body: Array[Byte]) {
         Json.parse(fromBytes(body)).validate[Seq[ClusterQueueResponse]] match {
           case s: JsSuccess[Seq[ClusterQueueResponse]] => {
+            println("Received Cluster:" + fromBytes(body))
             val parsedClusters = s.get.map(f => f.toCluster())
             clusterDao.insert(parsedClusters) onComplete {
               case Failure(t) => println(t.getStackTrace)

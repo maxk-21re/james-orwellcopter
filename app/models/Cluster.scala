@@ -5,26 +5,31 @@ import play.api.libs.json._
 import com.vividsolutions.jts.geom.GeometryFactory
 import play.api.libs.functional.syntax._
 
-case class Fuckery(p: Polygon)
-object Fuckery {
-  implicit val polygonWrites: Writes[Fuckery] = (
-    (JsPath).write[Fuckery]
+case class Shell(polygon: Polygon)
+
+object Shell {
+  implicit val polygonWrites: Writes[Shell] = (
+    (__).write[Shell]
   )(
-    (p: Fuckery) =>
+    (p: Shell) =>
       JsArray(
-        p.p.getCoordinates()
+        p.polygon
+          .getCoordinates()
           .map { coord =>
             JsArray(Seq(JsNumber(coord.x), JsNumber(coord.y)))
           }
           .toSeq))
 
-  implicit val polygonReads: Reads[Fuckery] = (
-    (JsPath).read[Fuckery]
+  implicit val polygonReads: Reads[Shell] = (
+    (__).read[Shell]
   )((p: JsValue) => {
     p.validate[Seq[(Double, Double)]] match {
       case s: JsSuccess[Seq[(Double, Double)]] =>
-        JsSuccess(Fuckery(
-          new GeometryFactory().createPolygon(s.get.map(i => new Coordinate(i._1, i._2)).toArray)))
+        JsSuccess(
+          Shell(
+            new GeometryFactory().createPolygon(
+              (s.get :+ s.get.head).map(i => new Coordinate(i._1, i._2)).toArray
+            )))
       case e: JsError => {
         println("Failed parsing to Polygon: " + e.errors.mkString(" | "))
         e
@@ -33,11 +38,7 @@ object Fuckery {
   })
 }
 
-case class Cluster(mbr: Envelope,
-                   shell: Fuckery,
-                   location: JsValue,
-                   adress: JsValue,
-                   id: Long = 0L)
+case class Cluster(mbr: Envelope, shell: Shell, location: JsValue, adress: JsValue, id: Long = 0L)
 
 object Cluster {
 

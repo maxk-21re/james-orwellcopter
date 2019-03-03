@@ -35,7 +35,7 @@ class ClusterPublishScheduler @Inject()(
 
   val schedulerExpression = """akka.quartz.schedules.At1AM.expression = "0 12 23 * * ? *""""
   val scheduleActor = ActorSystem("scheduler", ConfigFactory.parseString(schedulerExpression))
-  def start = { 
+  def start = {
     Logger.info("Starting ClusterPublishScheduler: " + new LocalDateTime().toString())
 
     class ClusterPublishActor extends Actor {

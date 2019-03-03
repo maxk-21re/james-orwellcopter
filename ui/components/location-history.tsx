@@ -73,7 +73,7 @@ class LocationHistory extends React.Component<Props, State> {
                 <Grid rowGap={[20, "px"]} colSpec={"fit-content(100%) 1fr fit-content(100%)"}>
                   {
                     this.props.logs
-                        .map(i => this.renderLocationItem(i, hovered && hovered.id == i.id))}
+                        .map(i => this.renderLocationItem(i, hovered && hovered.id == i.id || false))}
                 </Grid>
               </Panel>
             </GridItem>

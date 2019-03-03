@@ -10,7 +10,7 @@ import com.vividsolutions.jts.geom.GeometryFactory
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import models.Cluster
+import models.{Cluster, Shell}
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.db.slick.HasDatabaseConfigProvider
 import play.api.libs.json.JsValue
@@ -60,14 +60,14 @@ class ClusterDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     db.run((Clusters returning Clusters.map(_.id)) ++= toRawCluster(clusters))
 
   def toCluster(raw: RawCluster): Cluster =
-    new Cluster(raw.mbr.getEnvelopeInternal(), raw.shell, raw.location, raw.adress, raw.id)
+    new Cluster(raw.mbr.getEnvelopeInternal(), Shell(raw.shell), raw.location, raw.adress, raw.id)
 
   def toCluster(raw: Seq[RawCluster]): Seq[Cluster] =
-    raw.map(e => new Cluster(e.mbr.getEnvelopeInternal, e.shell, e.adress, e.adress, e.id))
+    raw.map(e => new Cluster(e.mbr.getEnvelopeInternal, Shell(e.shell), e.adress, e.adress, e.id))
 
   def toRawCluster(cluster: Cluster): RawCluster =
     new RawCluster(new GeometryFactory().toGeometry(cluster.mbr),
-                   cluster.shell,
+                   cluster.shell.polygon,
                    cluster.location,
                    cluster.adress,
                    cluster.id)
@@ -75,7 +75,7 @@ class ClusterDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     clusters.map(
       cluster =>
         new RawCluster(new GeometryFactory().toGeometry(cluster.mbr),
-                       cluster.shell,
+                       cluster.shell.polygon,
                        cluster.location,
                        cluster.adress,
                        cluster.id))

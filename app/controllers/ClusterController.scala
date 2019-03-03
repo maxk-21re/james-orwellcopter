@@ -20,6 +20,12 @@ class ClusterController @Inject()(cc: ControllerComponents,
                                   geologDAO: GeologDAO)(implicit assetsFinder: AssetsFinder)
     extends AbstractController(cc) {
 
+  def listClusters() = Action.async { request =>
+    clusterDao.all().map { result =>
+      Ok(Json.toJson(result))
+    }
+  }
+
   def cluster(id: Long) = Action.async { request =>
     clusterDao.find(id).map {
       case Some(cluster) => Ok(Json.toJson(cluster))
