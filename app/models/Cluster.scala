@@ -8,9 +8,7 @@ import play.api.libs.functional.syntax._
 case class Shell(polygon: Polygon)
 
 object Shell {
-  implicit val polygonWrites: Writes[Shell] = (
-    (__).write[Shell]
-  )(
+  implicit val polygonWrites = Writes[Shell](
     (p: Shell) =>
       JsArray(
         p.polygon
@@ -20,9 +18,7 @@ object Shell {
           }
           .toSeq))
 
-  implicit val polygonReads: Reads[Shell] = (
-    (__).read[Shell]
-  )((p: JsValue) => {
+  implicit val polygonReads = Reads[Shell]((p: JsValue) => {
     p.validate[Seq[(Double, Double)]] match {
       case s: JsSuccess[Seq[(Double, Double)]] =>
         JsSuccess(
@@ -51,7 +47,7 @@ object Cluster {
     )
   }
 
-  implicit val pointReads: Reads[Envelope] = (
+  implicit val envelopeReads: Reads[Envelope] = (
     (JsPath \ "minX").read[Double] and
     (JsPath \ "minY").read[Double] and
     (JsPath \ "maxX").read[Double] and

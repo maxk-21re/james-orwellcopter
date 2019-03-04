@@ -24,3 +24,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
